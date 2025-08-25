@@ -72,3 +72,36 @@ body {
             color: #43423e;
             cursor: pointer;
         }
+
+.otp-div{
+    border:none;
+    display:flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap:20px;
+    width:300px;
+    height:200px;
+    margin:auto;
+    margin-top:50px;
+    padding:20px;
+    border-radius:17px;
+    background-color: rgb(255, 248, 237);
+    box-shadow: 0px 0px 5px 4px rgba(0, 0, 0, 0.2);
+}
+.otp-div input{
+    width:200px;
+    height:40px;
+    font-size:25px;
+    text-align: center;
+}
+.otp-div button{
+    width:150px;
+    height:40px;
+    font-size:23px;
+}
+.otp-div p{
+    font-size:20px;
+    color:rgb(255, 0, 0);
+    font-family:Verdana, Geneva, Tahoma, sans-serif;
+}
