@@ -3,7 +3,6 @@ import { githubProvider, googleProvider } from './firebase';
 import { useState,useEffect} from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import ProtectedRoute from './protectedrouter';
 import { 
   onAuthStateChanged, 
   createUserWithEmailAndPassword, 
@@ -16,8 +15,6 @@ import {
   signInWithEmailLink 
 } from "firebase/auth";
 import { auth } from "./firebase"; 
-import { Routes, Route, Link } from "react-router-dom";
-import Home from './home';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -28,6 +25,8 @@ function App() {
   const [err, setErr] = useState("");
   const [otp,setOtp] = useState("");
   const navigate = useNavigate();
+  const [otptime,setOtptime] = useState(300);
+  const [displayTime,setDisplayTime] = useState("5:00");
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (u) => {
       setUser(u ?? null);
@@ -35,6 +34,30 @@ function App() {
     });
     return () => unsub();
   }, []);
+  
+  useEffect(() => {
+  if (step !== "otp") return;
+
+  const interval = setInterval(() => {
+    setOtptime((prev) => {
+      if (prev <= 1) {
+        clearInterval(interval);
+        alert("OTP expired, please resend.");
+        return 0;
+      }
+      return prev - 1;
+    });
+  }, 1000);
+
+  return () => clearInterval(interval); // cleanup when step changes
+}, [step]);
+
+// Update display string whenever otptime changes
+useEffect(() => {
+  const minutes = Math.floor(otptime / 60);
+  const seconds = otptime % 60;
+  setDisplayTime(`${minutes}:${seconds < 10 ? "0" : ""}${seconds}`);
+}, [otptime]);
 
 // const actionCodeSettings = {
 //   url: "http://localhost:5173/home",
@@ -123,11 +146,11 @@ function App() {
       const res=await axios.post("http://localhost:4000/verify-otp",{email,otp});
     alert(res.data.message);
     localStorage.setItem("token",res.data.token);
+     navigate("/home");
     }
     catch(err){
-      alert(err.res.data.error);
+      alert(err.response.data.error);
     }
-    navigate("/home");
   }
 
         function togglepass(){
@@ -152,15 +175,10 @@ function App() {
     }
   return (
     <>
-      <nav>
-        <Link to="/home">Home</Link>
-      </nav>
-      <Routes>
-        <Route path="/home" element={<ProtectedRoute><Home/></ProtectedRoute>} />
-      </Routes>
+     
       {step === "email" && (<>
       <h1>login</h1>
-      <form className="login-form">
+      <form className="login-form" onSubmit={sendotp}>
         <label htmlFor="username">username : </label>
         <input type="text" id="username" required />
         <br />
@@ -186,7 +204,7 @@ function App() {
         <label htmlFor="email">email : </label>
         <input type="email" id="email" required onChange={(e)=>setEmail(e.target.value)}/>
         <br />
-        <button type="submit" onClick={sendotp}>submit</button>
+        <button type="submit">submit</button>
       </form>
       
       <p>if already login? please <a href="">signup</a></p>
@@ -200,8 +218,11 @@ function App() {
       </>)}
       {step === "otp" && (
         <>
+          <div className='otp-div'>
           <input value={otp} onChange={(e) => setOtp(e.target.value)} placeholder="Enter OTP" />
           <button onClick={verifyotp}>Verify OTP</button>
+          <p id='otptimer'>{displayTime}</p>
+          </div>
         </>
       )}
     </>
