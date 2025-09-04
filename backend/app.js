@@ -1,10 +1,22 @@
-import express from "express";
 import nodemailer from "nodemailer";
+import user from "./user.js";
+import express from "express";
+import mongoose from "mongoose";
+import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import User from "./user.js";
 import cors from "cors";
 
 const app = express();
 app.use(express.json());
+
+mongoose.connect('mongodb+srv://charithpuligundla:Charith%402007@cherrycluster.0s50tpu.mongodb.net/?retryWrites=true&w=majority&appName=cherryCluster', {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+}).then(() => console.log('mongodb connected'))
+    .catch(err => console.log('connection failed', err));
+
+const SECRET_KEY = 'code339';
 
 // Allow frontend (5173) to talk to backend (4000)
 app.use(cors({
