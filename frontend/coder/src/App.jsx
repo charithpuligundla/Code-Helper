@@ -115,22 +115,22 @@ useEffect(() => {
   //   }
   // };
 
-  const loginWith = async (provider) => {
-    setErr("");
-    try {
-      await signInWithPopup(auth, provider);
-    } catch (e) {
-      if (e?.code === "auth/popup-blocked") {
-        await signInWithRedirect(auth, provider);
-      } else {
-        setErr(e.message);
-      }
-    }
-  };
+  // const loginWith = async (provider) => {
+  //   setErr("");
+  //   try {
+  //     await signInWithPopup(auth, provider);
+  //   } catch (e) {
+  //     if (e?.code === "auth/popup-blocked") {
+  //       await signInWithRedirect(auth, provider);
+  //     } else {
+  //       setErr(e.message);
+  //     }
+  //   }
+  // };
 
-  const logout = async () => {
-    await signOut(auth);
-  };
+  // const logout = async () => {
+  //   await signOut(auth);
+  // };
 
   if (loading) return <div style={{ padding: 24 }}>Checking session…</div>;
   
