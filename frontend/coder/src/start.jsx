@@ -6,10 +6,6 @@ import Probpage from "./probpage";
 function Start(){
     return (
         <>
-         <nav>
-        <Link to="/">App</Link>
-        <Link to="/home">Home</Link>
-      </nav>
       <Routes>
         <Route path="/" element={<ProtectedRoute><App/></ProtectedRoute>} />
         <Route path="/home" element={<ProtectedRoute><Home/></ProtectedRoute>} />

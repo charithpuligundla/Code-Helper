@@ -1,13 +1,18 @@
 import nodemailer from "nodemailer";
-import user from "./user.js";
 import express from "express";
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import User from "./user.js";
+import user from "./user.js";
 import cors from "cors";
+import bodyParser from "body-parser";
+import { exec } from "child_process";
+import fs from "fs";
+import path from "path";
+import os from "os";
 
 const app = express();
+app.use(bodyParser.json());
 app.use(express.json());
 
 mongoose.connect('mongodb+srv://charithpuligundla:Charith%402007@cherrycluster.0s50tpu.mongodb.net/?retryWrites=true&w=majority&appName=cherryCluster', {
@@ -68,6 +73,63 @@ app.post("/verify-otp", (req, res) => {
   delete otpStore[email]; // clear OTP after success
 
   res.json({ message: "Login success", token });
+});
+
+app.post("/run", async (req, res) => {
+  const { code, language } = req.body;
+
+  // Create temp directory for this run
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "code-"));
+  let fileName = "";
+  let cmd = "";
+
+  try {
+    switch (language) {
+      case "javascript":
+        fileName = path.join(tmpDir, "script.js");
+        fs.writeFileSync(fileName, code);
+        cmd = `docker run --rm -v "${tmpDir}:/app" -w /app node:18 node script.js`;
+        break;
+
+      case "python":
+        fileName = path.join(tmpDir, "script.py");
+        fs.writeFileSync(fileName, code);
+        cmd = `docker run --rm -v "${tmpDir}:/app" -w /app python:3.12 python script.py`;
+        break;
+
+      case "java":
+        fileName = path.join(tmpDir, "Main.java");
+        fs.writeFileSync(fileName, code);
+        cmd = `docker run --rm -v "${tmpDir}:/app" -w /app openjdk:20 bash -c "javac Main.java && java Main"`;
+        break;
+
+      case "c":
+        fileName = path.join(tmpDir, "main.c");
+        fs.writeFileSync(fileName, code);
+        cmd = `docker run --rm -v "${tmpDir}:/app" -w /app gcc:13 bash -c "gcc main.c -o main && ./main"`;
+        break;
+
+      case "cpp":
+        fileName = path.join(tmpDir, "main.cpp");
+        fs.writeFileSync(fileName, code);
+        cmd = `docker run --rm -v "${tmpDir}:/app" -w /app gcc:13 bash -c "g++ main.cpp -o main && ./main"`;
+        break;
+
+      default:
+        return res.send({ error: "Language not supported" });
+    }
+
+    exec(cmd, { shell: "powershell.exe" }, (err, stdout, stderr) => {
+      // Cleanup temp files
+      fs.rmSync(tmpDir, { recursive: true, force: true });
+
+      if (err) return res.send({ error: stderr || err.message });
+      res.send({ output: stdout });
+    });
+  } catch (e) {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+    res.send({ error: e.message });
+  }
 });
 
 app.listen(4000, () => console.log("Server running on http://localhost:4000"));
