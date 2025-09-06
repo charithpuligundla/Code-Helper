@@ -19,8 +19,8 @@ function Home(){
                     questions.map((ques,index)=>{
                         return (
                             <div className="row" key={index} onClick={()=>{
+                                localStorage.setItem("ques",JSON.stringify(ques));
                                 navigate("/probpage");
-                                localStorage.setItem("title",ques.title);
                                 }}>
                                 <div className="cell">{index+1}</div>
                                 <div className="cell">{ques.title}</div>

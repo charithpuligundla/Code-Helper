@@ -1,0 +1,41 @@
+.editor-div{
+    height:75vh;
+    width: 50vw;
+    border:2px solid rgba(68, 68, 68, 0.614);
+    border-radius: 12px;
+    box-shadow: 0px 0px 5px 2px rgba(58, 57, 57, 0.674);
+    margin-top:20px;
+    overflow:hidden;
+}
+#run{
+    width:100px;
+}
+.qanda-div{
+    display:flex;
+    flex-direction: row;
+    gap:10px;
+}
+.question-div{
+    width:40vw;
+    height:72vh;
+    background-color: rgb(16, 16, 15);
+    color:white;
+    border-radius: 10px;
+    padding:10px;
+    margin-top: 50px;
+    overflow-y: scroll;
+    scrollbar-width:none;
+}
+.top-bar{
+    display:flex;
+    flex-direction: row;
+    gap:13vw;
+}
+.lang-sel{
+    width: 100px;
+    height: 30px;
+    border-radius: 8px;
+    font-size: 17px;
+    box-shadow: 0px 0px 5px 2px rgba(58, 57, 57, 0.674);
+    margin-left: 10px;;
+}
